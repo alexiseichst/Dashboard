@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<dashboard>
+    <instructions>
+
+        <RoanneDB>
+            <description>Daily build at Roanne</description>
+            <command std="stdout">
+                <executable>pwd</executable>
+            </command>
+            <command std="stdout">
+                <executable>pwd</executable>
+            </command>
+        </RoanneDB>
+
+        <ChennaiDB>
+            <description>Daily build at Chennai</description>
+            <command std="stdout">
+                <executable>ls</executable>
+                <arg>-al</arg>
+            </command>
+            <command std="stdout">
+                <executable>ls</executable>
+                <arg>-al</arg>
+            </command>
+        </ChennaiDB>
+    </instructions>
+</dashboard>
