@@ -50,6 +50,10 @@ class Instruction:
         self.__commands = []
     
     def __str__(self):
+        return self.str
+
+    @property
+    def str(self):
         rt = ''
         rt+='{}'.format(self.name)
         rt+='\n Description: {}'.format(self.__description)
@@ -90,49 +94,43 @@ class Instruction:
         return rt
 
 class HTML:
-    instructions = {}
-
-    # constructor
-    def __init__(self, instructions):  
-        self.instructions = instructions
+    def __init__(self,tabs):
+        self.__tabs = tabs
 
     @property
     def file_content(self):
-        return self.__generate_table()
+        return self.__gen_content()
+    
+    @property
+    def tabs(self):
+        return self.__tabs
 
-    def __gen_head(self,cols):
-        txt = "<tr>"
-        for c in cols:
-           txt += "<th>{}</th>".format(c)
-        txt += "</tr>"
-        return txt
+    def __gen_content(self):
+        root = ET.Element("root")
+        doc = ET.SubElement(root, "doc")
+        for name,tab in self.tabs.items():
+            self.__gen_tab(doc,name,tab)
+        return ET.tostring(root)
 
-    def __gen_line(self,cols):
-        txt = "<tr>"
-        for c in cols:
-           txt += "<td>{}</td>".format(c)
-        txt += "</tr>"
-        return txt
+    def __gen_tab(self,elem,name,tab):
+            #Table
+            elem = ET.SubElement(elem, "table",style="width:100%")
 
-    def __generate_table(self):
-        txt = "<table style=\"width:100%\">"
-        txt += self.__gen_head(['Name','Description','Result'])
-        for key in self.instructions:
-            inst = self.instructions[key]
-            txt += self.__gen_line([inst.name,
-                                inst.description,
-                                inst.result])
-        txt += "</table>"
-        return txt
-        
+            #Head
+            elem = ET.SubElement(elem, "tr")
+            for col in tab[0]:        
+                ET.SubElement(elem, "th").text = col
 
-    def generate_file(self):
-        file_name = 'dashboard.html'
-        txt = self.file_content
-        f = open(file_name,'wb')
-        f.write(txt.encode())
-        f.close()
-        return file_name
+            #Data
+            for t in tab[1:]:
+                elem = ET.SubElement(elem, "tr")
+                for col in t:
+                    ET.SubElement(elem, "td").text = col
+
+def create_html_file(file_name,file_content):
+    f = open(file_name,'wb')
+    f.write(file_content)
+    f.close()
 
 # Command of instruction factory
 def createCommand(node):
@@ -160,14 +158,25 @@ def parseInstructions():
         inst_dict[node.tag] = createInstructions(node)
     return inst_dict
 
+def genTabsDict(inst_dict):
+    tabs_dict = {}
+    tab = [['name','description','result']]
+    for key in inst_dict.keys:
+        inst = inst_dict[key]
+        tab.append([inst.name,inst.name,inst.result])
+    tabs_dict['Daily Build'] = tab
+    return tabs_dict
+
 def main():
     print("Reading xml...")
     inst_dict = parseInstructions()
+    tabs_dict = genTabsDict(inst_dict)
 
     print("Generate html...")
-    html_file = HTML(inst_dict)
-    html_file.generate_file()
-    webbrowser.open_new_tab(html_file.generate_file())
+    html_file_name = 'Dashboard.html'
+    html = HTML(tabs_dict)
+    create_html_file(html_file_name,html.file_content)
+    webbrowser.open_new_tab(html_file_name)
     
 if __name__ == "__main__":
     main()
