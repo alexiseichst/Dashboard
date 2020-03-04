@@ -72,7 +72,7 @@ class Instruction:
 
     @property
     def description(self):
-        return self.__name
+        return self.__description
 
     @description.setter
     def description(self, value):
@@ -106,7 +106,7 @@ class HTML:
         return self.__tabs
 
     def __gen_content(self):
-        root = ET.Element("root")
+        root = ET.Element("html")
         doc = ET.SubElement(root, "doc")
         for name,tab in self.tabs.items():
             self.__gen_tab(doc,name,tab)
@@ -134,19 +134,19 @@ def create_html_file(file_name,file_content):
 
 # Command of instruction factory
 def createCommand(node):
-    exec = node.find('executable').text
+    exec = node.find('Executable').text
     std = node.attrib['std']
     rt = Command(exec,std)
-    for a in node.findall('arg'):
+    for a in node.findall('Args/*'):
        rt.add_arg(a.text)
     return rt
 
 # Instruction factory
 def createInstructions(node):
-    rt = Instruction(node.tag)
-    rt.description = node.find('description').text
-    for c in node.findall('command'):
-        rt.add_command(createCommand(c))
+    rt = Instruction(node.attrib['name'])
+    rt.description = node.attrib['description']
+    for c in node.findall('CompareValues/Commands/*'):
+            rt.add_command(createCommand(c))
     print(rt)
     return rt
 
@@ -154,15 +154,15 @@ def createInstructions(node):
 def parseInstructions():
     inst_dict = {}
     root = ET.parse('instructions.xml').getroot()
-    for node in root.findall('instructions/*'):
+    for node in root.findall('Instructions/*'):
         inst_dict[node.tag] = createInstructions(node)
     return inst_dict
 
 def genTabsDict(inst_dict):
     tabs_dict = {}
     tab = [['name','description','result']]
-    for key in inst_dict.keys:
-        inst = inst_dict[key]
+    for i in inst_dict:
+        inst = inst_dict[i]
         tab.append([inst.name,inst.name,inst.result])
     tabs_dict['Daily Build'] = tab
     return tabs_dict
