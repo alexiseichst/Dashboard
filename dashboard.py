@@ -5,9 +5,8 @@ from tabulate import tabulate
 
 class Command:
     # Constructor with executable name and std type
-    def __init__(self, executable, std):  
+    def __init__(self, executable):  
         self.__executable = executable
-        self.__std = std
         self.__args = []
 
     def __str__(self):
@@ -22,14 +21,16 @@ class Command:
         self.__args.append(arg)
 
     # Execute the command
-    def exec(self):
+    @property
+    def result(self):
         rt = {}
-        command = [self.__executable]
-        command += self.__args
+        command = "{} {}".format(self.__executable,' '.join(self.__args))
         process = subprocess.Popen(command,
                         stdout=subprocess.PIPE,
-                        stderr=subprocess.PIPE)
+                        stderr=subprocess.PIPE,
+                        shell=True)
         rt['stdout'], rt['stderr'] = process.communicate()
+        rt['command'] = command
         return rt
 
 class Instruction:
@@ -76,13 +77,15 @@ class Instruction:
     # Execute all commands and compare the result
     @property
     def result(self):
-        rt = True
-        res = self.__commands[0].exec()
-        for c in self.__commands:
-            if res != c.exec():
-                rt = False
-                break
-        return rt
+        stdout_list=[]
+        stderr_list=[b'']
+        for r in self.__commands:
+            std = r.result
+            stdout_list.append(std['stdout'])
+            stderr_list.append(std['stderr'])
+        result = all(stdout_list[0] == item for item in stdout_list)
+        result = all(stderr_list[0] == item for item in stderr_list) and result
+        return result
 
 class HTML:
     def __init__(self,tabs):
@@ -126,8 +129,7 @@ def create_html_file(file_name,file_content):
 # Command of instruction factory
 def createCommand(node):
     exec = node.find('Executable').text
-    std = node.attrib['std']
-    rt = Command(exec,std)
+    rt = Command(exec)
     for a in node.findall('Args/*'):
        rt.add_arg(a.text)
     return rt
