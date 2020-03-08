@@ -5,7 +5,7 @@ from HTML import HTML
 from Command import Command
 from Instruction import Instruction
 
-def create_html_file(file_name,file_content):
+def create_file(file_name,file_content):
     f = open(file_name,'wb')
     f.write(file_content)
     f.close()
@@ -83,7 +83,7 @@ def main():
     # Create HTML
     html_file_name = 'Dashboard.html'
     html = HTML(tabs_dict)
-    create_html_file(html_file_name,html.file_content)
+    create_file(html_file_name,html.file_content)
     webbrowser.open_new_tab(html_file_name)
 
     # Print result

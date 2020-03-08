@@ -4,20 +4,38 @@
         <Instruction name="RoanneDB" description="Daily build at Roanne">
             <CompareValues>
                 <Commands>
-                    <Command std="stdout">
+                    <Command>
                         <Executable>ls</Executable>
                         <Args>
                             <Arg>/usr</Arg>
                         </Args>
                     </Command>
-                    <Command std="stdout">
+                    <Command>
                         <Executable>ls</Executable>
                         <Args>
                             <Arg>/usr</Arg>
                         </Args>
                     </Command>
                 </Commands>
-            </CompareValues>         
+            </CompareValues>       
+        </Instruction>
+        <Instruction name="ChennaiDB" description="Daily build at Chennai">
+            <CompareValues>
+                <Commands>
+                    <Command>
+                        <Executable>ls</Executable>
+                        <Args>
+                            <Arg>/usr</Arg>
+                        </Args>
+                    </Command>
+                    <Command>
+                        <Executable>ls</Executable>
+                        <Args>
+                            <Arg>/usr/bin</Arg>
+                        </Args>
+                    </Command>
+                </Commands>
+            </CompareValues>       
         </Instruction>
     </Instructions>
 </Dashboard>
