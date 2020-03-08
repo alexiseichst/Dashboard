@@ -90,36 +90,59 @@ class Instruction:
 class HTML:
     def __init__(self,tabs):
         self.__tabs = tabs
+        self.__init_bool_to_html()
+        self.__init_type_to_html()
+        
+    def __init_type_to_html(self):
+        self.__type_html = {}
+        self.__type_html[str] = lambda data : data
+        self.__type_html[bool] = lambda data : self.bool_html(data)
+        
+    def data_to_html(self,data):
+        t = type(data)
+        return self.__type_html[t](data)
+        
+    def __init_bool_to_html(self):
+        self.__bool_html = {}
+        self.__bool_html[True] = lambda : 'Valid'
+        self.__bool_html[False] = lambda : 'Error'
 
-    @property
-    def file_content(self):
-        return self.__gen_content()
-    
+    def bool_html(self,data):
+        return self.__bool_html[data]()
+
     @property
     def tabs(self):
         return self.__tabs
 
-    def __gen_content(self):
-        root = ET.Element("html")
-        doc = ET.SubElement(root, "doc")
+    @property
+    def file_content(self):
+        html = ET.Element('html')
+
+        #Head
+        head = ET.SubElement(html,'head')
+        ET.SubElement(head,'link',rel='stylesheet',href='styles.css')
+
+        #Body
+        body = ET.SubElement(html, 'body')
+        div = ET.SubElement(body, "div", style="overflow-x:auto;")
         for name,tab in self.tabs.items():
-            self.__gen_tab(doc,name,tab)
-        return ET.tostring(root)
+            self.__gen_tab(div,name,tab)
+        return ET.tostring(html)
 
     def __gen_tab(self,elem,name,tab):
-            #Table
-            elem = ET.SubElement(elem, "table",style="width:100%")
+        #Table
+        table = ET.SubElement(elem, "table")
 
-            #Head
-            elem = ET.SubElement(elem, "tr")
-            for col in tab[0]:        
-                ET.SubElement(elem, "th").text = col
+        #Head
+        head = ET.SubElement(table, "tr")
+        for col in tab[0]:        
+            ET.SubElement(head, "th").text = col
 
-            #Data
-            for t in tab[1:]:
-                elem = ET.SubElement(elem, "tr")
-                for col in t:
-                    ET.SubElement(elem, "td").text = col
+        #Data
+        for t in tab[1:]:
+            data = ET.SubElement(table, "tr")
+            for col in t:
+                ET.SubElement(data, "td").text = self.data_to_html(col)
 
 def create_html_file(file_name,file_content):
     f = open(file_name,'wb')
@@ -197,10 +220,10 @@ def main():
     tabs_dict = genTabsDict(inst_dict)
 
     # Create HTML
-    #html_file_name = 'Dashboard.html'
-    #html = HTML(tabs_dict)
-    #create_html_file(html_file_name,html.file_content)
-    #webbrowser.open_new_tab(html_file_name)
+    html_file_name = 'Dashboard.html'
+    html = HTML(tabs_dict)
+    create_html_file(html_file_name,html.file_content)
+    webbrowser.open_new_tab(html_file_name)
 
     # Print result
     print_result(tabs_dict)

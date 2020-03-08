@@ -7,19 +7,16 @@
                     <Command std="stdout">
                         <Executable>ls</Executable>
                         <Args>
-                            <Arg>/appli/amesim</Arg>
+                            <Arg>/usr</Arg>
                         </Args>
                     </Command>
                     <Command std="stdout">
                         <Executable>ls</Executable>
                         <Args>
-                            <Arg>/amedev/appli/amesim</Arg>
+                            <Arg>/usr</Arg>
                         </Args>
                     </Command>
                 </Commands>
-                <Constants>
-                    <Constant>/data/appli</Constant>
-                </Constants>
             </CompareValues>         
         </Instruction>
     </Instructions>
